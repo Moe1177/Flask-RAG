@@ -1,11 +1,9 @@
 import os
-import json
-import threading
 import traceback
 from dotenv import load_dotenv
 from datetime import datetime
 
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 
@@ -13,9 +11,7 @@ from sentence_transformers import SentenceTransformer
 from langchain_pinecone import PineconeVectorStore
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from pinecone import Pinecone
-from git import Repo
 from openai import OpenAI
-from langchain.schema import Document
 from pinecone import Pinecone
 
 load_dotenv()
