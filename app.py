@@ -1,6 +1,3 @@
-# import eventlet
-# eventlet.monkey_patch()
-
 import os
 import traceback
 from functools import lru_cache
@@ -11,8 +8,7 @@ from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 
 from sentence_transformers import SentenceTransformer
-from langchain_pinecone import PineconeVectorStore
-from langchain_community.embeddings import HuggingFaceEmbeddings
+
 from pinecone import Pinecone
 from openai import OpenAI
 
@@ -21,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Lightweight connection management
 mongo_client = MongoClient(os.environ.get('MONGO_URI'), maxPoolSize=10)
@@ -79,14 +75,17 @@ def perform_rag(query, model="deepseek/deepseek-r1-distill-llama-70b:free"):
     try:
         pinecone_index = ClientManager.get_pinecone_client().Index("codebase-rag")
         openrouter_client = ClientManager.get_openrouter_client()
+        print("Connecting to Pinecone...")
 
         raw_query_embedding = get_huggingface_embeddings(query)
+        print("Embedding query...")
         top_matches = pinecone_index.query(
             vector=raw_query_embedding.tolist(),
             top_k=3,
             include_metadata=True,
             namespace=os.environ.get("GITHUB_REPO_URL")
         )
+        print("Returned top matches...")
         
         contexts = [item['metadata']['text'] for item in top_matches['matches']]
         augmented_query = "\n" + "\n\n-------\n\n".join(contexts[:10]) + \
