@@ -75,41 +75,41 @@ client = OpenAI(
 
 # ---------------------------------------------------------------------------
 
-def get_file_content(file_path, REPO_PATH):
-    """
-    Returns the relative file name and its content.
-    """
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            content = file.read()
-        rel_path = os.path.relpath(file_path, REPO_PATH)
-        return {"name": rel_path, "content": content}
-    except Exception as e:
-        print(f"Error reading file: {file_path}: {str(e)}")
-        return None
+# def get_file_content(file_path, REPO_PATH):
+#     """
+#     Returns the relative file name and its content.
+#     """
+#     try:
+#         with open(file_path, "r", encoding="utf-8") as file:
+#             content = file.read()
+#         rel_path = os.path.relpath(file_path, REPO_PATH)
+#         return {"name": rel_path, "content": content}
+#     except Exception as e:
+#         print(f"Error reading file: {file_path}: {str(e)}")
+#         return None
 
-def get_main_files_content(REPO_PATH):
-    """
-    Walks the repository and retrieves contents of supported files,
-    ignoring directories defined in IGNORED_DIRS.
-    """
-    try:
-        files_content = []
-        for root, _, files in os.walk(REPO_PATH):
-            if any(ignored in root for ignored in IGNORED_DIRS):
-                continue
+# def get_main_files_content(REPO_PATH):
+#     """
+#     Walks the repository and retrieves contents of supported files,
+#     ignoring directories defined in IGNORED_DIRS.
+#     """
+#     try:
+#         files_content = []
+#         for root, _, files in os.walk(REPO_PATH):
+#             if any(ignored in root for ignored in IGNORED_DIRS):
+#                 continue
 
-            for file in files:
-                file_path = os.path.join(root, file)
-                if os.path.splitext(file_path)[1] in SUPPORTED_EXTENSIONS:
-                    file_content = get_file_content(file_path, REPO_PATH)
+#             for file in files:
+#                 file_path = os.path.join(root, file)
+#                 if os.path.splitext(file_path)[1] in SUPPORTED_EXTENSIONS:
+#                     file_content = get_file_content(file_path, REPO_PATH)
 
-                    if file_content:
-                        files_content.append(file_content)
-    except Exception as e:
-        print(f"Error reading files: {str(e)}")
-        return None
-    return files_content
+#                     if file_content:
+#                         files_content.append(file_content)
+#     except Exception as e:
+#         print(f"Error reading files: {str(e)}")
+#         return None
+#     return files_content
     
 
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
