@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import traceback
 from functools import lru_cache
@@ -17,7 +20,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Lightweight connection management
 mongo_client = MongoClient(os.environ.get('MONGO_URI'), maxPoolSize=10)
@@ -144,4 +147,4 @@ def handle_chat_message(data):
     emit('chat_response', {'response': response_text})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
