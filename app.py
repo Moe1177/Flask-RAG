@@ -79,21 +79,6 @@ client = OpenAI(
 
 # ---------------------------------------------------------------------------
 
-def clone_or_update_repo():
-    """Clones the repo if not present; otherwise, pulls latest changes."""
-    if os.path.exists(REPO_PATH):
-        try:
-            repo = Repo(REPO_PATH)
-            repo.remotes.origin.pull()
-            print("Repository updated successfully.")
-        except Exception as e:
-            print("Failed to pull latest changes:", str(e))
-    else:
-        repo_name = GITHUB_REPO_URL.split('/')[-1]
-        repo_path = f"/codebase/{repo_name}"
-        Repo.clone_from(GITHUB_REPO_URL, repo_path)
-        print("Repository cloned successfully.")
-
 def get_file_content(file_path, REPO_PATH):
     """
     Returns the relative file name and its content.
@@ -134,38 +119,6 @@ def get_main_files_content(REPO_PATH):
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
     model = SentenceTransformer(model_name)
     return model.encode(text)
-
-
-def initialize_vectorstore():
-    """
-    Clones the repository, extracts file contents, builds Documents,
-    and creates/updates the Pinecone vector store.
-    """
-    global vectorstore
-    try:
-        clone_or_update_repo()
-        print("Cloning repository and initializing vectorstore...")
-        files_content = get_main_files_content(REPO_PATH)
-        documents = []
-        for file in files_content:
-            doc = Document(
-                page_content=f"{file['name']}\n\n{file['content']}",
-                metadata={"text": file['content'], "source": file['name']}
-            )
-            documents.append(doc)
-        vectorstore = PineconeVectorStore.from_documents(
-            documents=documents,
-            embedding=HuggingFaceEmbeddings(),
-            index_name="codebase-rag",
-            namespace=NAMESPACE
-        )
-        print("Vectorstore initialized successfully.")
-    except Exception as e:
-        print("Error initializing vectorstore:", e)
-        traceback.print_exc()
-
-
-initialize_vectorstore()
 
 
 def perform_rag(query, model="deepseek/deepseek-r1-distill-llama-70b:free"):
@@ -215,31 +168,6 @@ def perform_rag(query, model="deepseek/deepseek-r1-distill-llama-70b:free"):
         return "Sorry, I encountered an error processing your request."
 
 
-@app.route('/webhook', methods=['POST'])
-def github_webhook():
-    """
-    Receives GitHub webhook events and triggers an update of embeddings.
-    In production, consider validating the webhook signature.
-    """
-    payload = request.json
-    print("Received GitHub webhook payload:", json.dumps(payload, indent=2))
-    threading.Thread(target=update_embeddings, args=(payload,)).start()
-    return jsonify({'status': 'processing'}), 202
-
-def update_embeddings(github_payload):
-    """
-    Updates the vector store by re-cloning the repository and rebuilding embeddings.
-    For a more efficient production solution, perform incremental updates.
-    """
-    try:
-        print("Updating embeddings based on GitHub payload...")
-        initialize_vectorstore()
-        print("Embeddings update complete.")
-    except Exception as e:
-        print("Error updating embeddings:", e)
-        traceback.print_exc()
-
-
 @socketio.on('chat_message')
 def handle_chat_message(data):
     """
@@ -272,4 +200,4 @@ def handle_chat_message(data):
 
 if __name__ == '__main__':
     # In production, disable debug and use an async WSGI server if possible.
-    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
