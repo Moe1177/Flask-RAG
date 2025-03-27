@@ -272,4 +272,4 @@ def handle_chat_message(data):
 
 if __name__ == '__main__':
     # In production, disable debug and use an async WSGI server if possible.
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=False)
