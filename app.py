@@ -1,6 +1,3 @@
-import eventlet
-eventlet.monkey_patch()
-
 import os
 import traceback
 from functools import lru_cache
@@ -147,4 +144,4 @@ def handle_chat_message(data):
     emit('chat_response', {'response': response_text})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
