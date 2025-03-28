@@ -7,6 +7,7 @@ from functools import lru_cache
 from datetime import datetime
 
 from flask import Flask
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 
@@ -19,6 +20,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
