@@ -26,7 +26,7 @@ chats_collection = db.chats
 
 # Use a more lightweight embedding model
 @lru_cache(maxsize=128)
-def get_huggingface_embeddings(text, model_name="sentence-transformers/all-mpnet-base-v2"):
+def get_huggingface_embeddings(text, model_name="sentence-transformers/all-MiniLM-L6-v2"):
     model = SentenceTransformer(model_name)
     return model.encode(text)
 
@@ -71,9 +71,9 @@ def strip_markdown(text):
     
     return text.strip()
 
-def perform_rag(query, model="deepseek/deepseek-r1-distill-llama-70b:free"):
+def perform_rag(query, model="deepseek/deepseek-r1:free"):
     try:
-        pinecone_index = ClientManager.get_pinecone_client().Index("codebase-rag")
+        pinecone_index = ClientManager.get_pinecone_client().Index("flask-rag")
         openrouter_client = ClientManager.get_openrouter_client()
         print("Connecting to Pinecone...")
 
