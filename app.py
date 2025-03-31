@@ -4,12 +4,10 @@ eventlet.monkey_patch()
 import os
 import traceback
 from functools import lru_cache
-from datetime import datetime
 
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-from pymongo import MongoClient
 
 from sentence_transformers import SentenceTransformer
 
@@ -19,10 +17,14 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+
 app = Flask(__name__)
 CORS(app)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+
+PORT = os.environ.get('PORT') or 5000
 
 # Use a more lightweight embedding model
 @lru_cache(maxsize=128)
@@ -164,4 +166,4 @@ def handle_chat_message(data):
     emit('chat_response', {'response': response_text})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=PORT, debug=False)
