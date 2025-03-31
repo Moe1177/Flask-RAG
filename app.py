@@ -24,11 +24,6 @@ CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
-# Lightweight connection management
-mongo_client = MongoClient(os.environ.get('MONGO_URI'), maxPoolSize=10)
-db = mongo_client.get_default_database()
-chats_collection = db.chats
-
 # Use a more lightweight embedding model
 @lru_cache(maxsize=128)
 def get_huggingface_embeddings(text, model_name="sentence-transformers/all-MiniLM-L6-v2"):
@@ -130,21 +125,9 @@ def handle_chat_message(data):
         emit('chat_response', {'response': 'Invalid message.'})
         return
 
-    chats_collection.insert_one({
-        'sender': 'user',
-        'message': user_message,
-        'timestamp': datetime.now()
-    })
-
     response_text = perform_rag(user_message)
 
     print("Response:", response_text)
-
-    chats_collection.insert_one({
-        'sender': 'bot',
-        'message': response_text,
-        'timestamp': datetime.now()
-    })
 
     emit('chat_response', {'response': response_text})
 
