@@ -24,7 +24,6 @@ CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
-PORT = os.environ.get('PORT') or 5000
 
 # Use a more lightweight embedding model
 @lru_cache(maxsize=128)
@@ -120,6 +119,15 @@ def perform_rag(query, model="deepseek/deepseek-r1:free"):
             - Never invent features or steps. If unsure, say:
                 *"This functionality isn’t documented in my guidelines. Could you rephrase or ask about a different feature?"*
 
+            5. **Response Format Rules**:
+                5.1. **Language**: Use only natural English—no Markdown (**, -, `) or code formatting.
+                5.2. **Steps**:  
+                - Group by device type if needed (e.g., "For Desktop Users:").  
+                - Use numbered steps for sequences (1, 2, 3...).  
+                - For sub-steps, use bullet points (plain * or ○ symbols).  
+                5.3. **Brevity**: Avoid repeating UI labels (e.g., say "purple button" once).  
+                5.4. **Clarity**: Explicitly note shared behaviors (e.g., "Both devices use the same page."). 
+
             ### 🔹 **Tone & Style**
             - Be **polite, concise, and professional**.
             - Use **bullet points for complex instructions**.
@@ -166,4 +174,4 @@ def handle_chat_message(data):
     emit('chat_response', {'response': response_text})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=PORT, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
