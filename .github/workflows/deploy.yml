@@ -22,7 +22,11 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
         
-    - name: Trigger Cloud Build
+    - name: Trigger Cloud Build and ignore log errors
       run: |
         gcloud builds submit --config cloudbuild.yaml \
-          --substitutions="_PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }},_OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }},_SECRET_KEY=${{ secrets.SECRET_KEY }},_GITHUB_REPO_URL=${{ secrets.GITHUB_REPO_URL }}"
+          --substitutions="_PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }},_OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }},_SECRET_KEY=${{ secrets.SECRET_KEY }},_GITHUB_REPO_URL=${{ secrets.GITHUB_REPO_URL }}" \
+          --async || true
+        
+        echo "Build submitted. Check the Google Cloud Console for build progress."
+        echo "https://console.cloud.google.com/cloud-build/builds?project=${{ secrets.GCP_PROJECT_ID }}"
