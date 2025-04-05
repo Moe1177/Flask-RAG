@@ -24,6 +24,7 @@ CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
+port = int(os.environ.get('PORT', 5000))
 
 # Use a more lightweight embedding model
 @lru_cache(maxsize=128)
@@ -174,4 +175,4 @@ def handle_chat_message(data):
     emit('chat_response', {'response': response_text})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=port, debug=False)
