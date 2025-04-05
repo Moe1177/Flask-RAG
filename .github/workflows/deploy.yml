@@ -23,4 +23,4 @@ jobs:
     - name: Trigger Cloud Build
       run: |
         gcloud builds submit --config cloudbuild.yaml \
-          --substitutions _PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }},_OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }},_SECRET_KEY=${{ secrets.SECRET_KEY }},_GITHUB_REPO_URL=${{ secrets.REPO_URL }}
+          --substitutions="_PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }},_OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }},_SECRET_KEY=${{ secrets.SECRET_KEY }},_GITHUB_REPO_URL=${{ secrets.REPO_URL }}"
